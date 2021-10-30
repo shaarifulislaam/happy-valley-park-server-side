@@ -12,7 +12,6 @@ app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ip6hg.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 
-console.log(uri);
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -26,7 +25,9 @@ async function run() {
     const ServicesCollection = client
       .db("happyValleyPark")
       .collection("services");
-    const UsersCollection = client.db("happyValleyPark").collection("users");
+    const BookingCollection = client
+      .db("happyValleyPark")
+      .collection("booking");
 
     //*GET API or GET all services
     app.get("/services", async (req, res) => {
@@ -51,6 +52,22 @@ async function run() {
       const result = await ServicesCollection.insertOne(req.body);
 
       res.json(result);
+    });
+
+    //* add place order
+    app.post("/placeBooking", async (req, res) => {
+      console.log(req.body);
+      const result = await BookingCollection.insertOne(req.body);
+      // console.log(result);
+      res.send(result);
+    });
+
+    //* get all booking
+
+    app.get("/placeBooking", async (req, res) => {
+      const result = await BookingCollection.find({}).toArray();
+      res.send(result);
+      // console.log(result);
     });
   } finally {
     // await client.close();
