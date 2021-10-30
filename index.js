@@ -63,11 +63,27 @@ async function run() {
     });
 
     //* get all booking
-
     app.get("/placeBooking", async (req, res) => {
       const result = await BookingCollection.find({}).toArray();
       res.send(result);
       // console.log(result);
+    });
+
+    //*filter email
+    app.get("/placeBooking/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = await BookingCollection.find({ email });
+      const result = await query.toArray();
+      // console.log(result);
+      res.send(result);
+    });
+    //*DELETE API
+    app.delete("/placeBooking/:id", async (req, res) => {
+      const id = req.params.id;
+      // console.log(id);
+      const query = { _id: ObjectId(id) };
+      const result = await BookingCollection.deleteOne(query);
+      res.send(result);
     });
   } finally {
     // await client.close();
