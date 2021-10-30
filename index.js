@@ -21,7 +21,6 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     await client.connect();
-    console.log("connected with the server");
     const ServicesCollection = client
       .db("happyValleyPark")
       .collection("services");
@@ -58,7 +57,6 @@ async function run() {
     app.post("/placeBooking", async (req, res) => {
       console.log(req.body);
       const result = await BookingCollection.insertOne(req.body);
-      // console.log(result);
       res.send(result);
     });
 
@@ -66,7 +64,6 @@ async function run() {
     app.get("/placeBooking", async (req, res) => {
       const result = await BookingCollection.find({}).toArray();
       res.send(result);
-      // console.log(result);
     });
 
     //*filter email
@@ -74,15 +71,32 @@ async function run() {
       const email = req.params.email;
       const query = await BookingCollection.find({ email });
       const result = await query.toArray();
-      // console.log(result);
       res.send(result);
     });
     //*DELETE API
     app.delete("/placeBooking/:id", async (req, res) => {
       const id = req.params.id;
-      // console.log(id);
       const query = { _id: ObjectId(id) };
       const result = await BookingCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    //*UPDATE API
+    app.put("/placeBooking/:id", async (req, res) => {
+      const id = req.params.id;
+      const updateDetails = req.body;
+      const query = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          status: updateDetails.status,
+        },
+      };
+      const result = await BookingCollection.updateOne(
+        query,
+        updateDoc,
+        options
+      );
       res.send(result);
     });
   } finally {
